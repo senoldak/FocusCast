@@ -1,0 +1,21 @@
+{
+  "name": "isolator",
+  "version": "1.0.0",
+  "description": "Online dersler ve toplantılar için kamera arka planı ve mikrofon ses izolasyon eklentisi.",
+  "main": "src/background/service-worker.js",
+  "scripts": {
+    "test": "node -e \"console.log('isolaTOR Ready')\""
+  },
+  "keywords": [
+    "webrtc",
+    "background-blur",
+    "noise-suppression",
+    "teacher-tools",
+    "chrome-extension"
+  ],
+  "author": "isolaTOR Team",
+  "license": "MIT",
+  "dependencies": {
+    "@mediapipe/selfie_segmentation": "^0.1.1675465747"
+  }
+}

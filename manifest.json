@@ -1,0 +1,82 @@
+{
+  "manifest_version": 3,
+  "name": "isolaTOR — Broadcast Studio Pro",
+  "version": "2.6.0",
+  "description": "Profesyonel görüntülü görüşmeler ve yayınlar için yapay zeka destekli kamera ve mikrofon izolasyon stüdyosu (Side Panel).",
+  "permissions": [
+    "storage",
+    "sidePanel"
+  ],
+  "side_panel": {
+    "default_path": "src/popup/popup.html"
+  },
+  "commands": {
+    "toggle-studio": {
+      "suggested_key": {
+        "default": "Alt+M"
+      },
+      "description": "Studio Modu AI Ses İzolasyonunu Aç/Kapat"
+    },
+    "toggle-blur": {
+      "suggested_key": {
+        "default": "Alt+B"
+      },
+      "description": "Arka Plan Bulanıklığını Aç/Kapat"
+    },
+    "toggle-widget": {
+      "suggested_key": {
+        "default": "Alt+W"
+      },
+      "description": "Görüşme İçi Yüzen Konsolu Göster/Gizle"
+    }
+  },
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "action": {
+    "default_title": "isolaTOR Broadcast Paneli",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/content/floating-widget.js",
+        "src/content/teleprompter.js",
+        "src/content/content-script.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/injected/interceptor.js",
+        "src/injected/video-processor.js",
+        "src/injected/audio-processor.js",
+        "src/injected/audio-worklet-processor.js",
+        "src/content/floating-widget.css",
+        "src/content/teleprompter.css",
+        "src/lib/mediapipe/*",
+        "src/assets/*",
+        "icons/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

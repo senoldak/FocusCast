@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>isolaTOR — Minimal Studio</title>
+  <link rel="stylesheet" href="popup.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="../lib/mediapipe/selfie_segmentation.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>isolaTOR</h1>
+          <div class="brand-sub">
+            <span class="live-badge"><span class="live-dot" id="liveDotIndicator"></span>Studio Pro</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="status-chip" id="globalStatusPill">
+          <svg viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="2.5" fill="currentColor"/></svg>
+          Hazır
+        </div>
+      </div>
+    </header>
+
+    <!-- PREVIEW FRAME -->
+    <section class="preview-strip" aria-label="Kamera Önizlemesi">
+      <div class="preview-frame">
+        <video id="previewVideo" autoplay playsinline muted aria-hidden="true"></video>
+        <canvas id="previewCanvas" aria-label="İşlenmiş video önizlemesi"></canvas>
+        <div class="preview-hud">
+          <div class="hud-top">
+            <div class="mode-badge" id="previewModeTag">Bulanık</div>
+            <div class="hud-actions">
+              <button class="pip-btn" id="laserBtn" title="Sanal Lazer İşaretçi">🔴 Lazer</button>
+              <button class="pip-btn" id="gazeBtn" title="Göz Hizalama Kılavuzu">🎯 Bakış</button>
+              <button class="pip-btn" id="snapshotBtn" title="Fotoğraf Çek">📸 Foto</button>
+              <button class="pip-btn" id="recordBtn" title="Kayıt Al">
+                <span class="record-dot" id="recordDot"></span>
+                <span id="recordBtnText">Kayıt</span>
+              </button>
+              <button class="pip-btn" id="pipBtn" title="Pencere İçinde Pencere (PiP)">PiP</button>
+            </div>
+          </div>
+          <div class="hud-top" style="justify-content: flex-end;">
+            <div class="audio-vu-strip" title="Mikrofon Seviyesi">
+              <div class="mini-vu" id="miniVu" aria-hidden="true">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK PRESETS RAIL -->
+    <div class="preset-rail" role="group" aria-label="Hızlı Profiller">
+      <span class="preset-title">Profil:</span>
+      <div class="preset-buttons">
+        <button class="preset-btn active" id="presetFocus" data-preset="focus">Odak</button>
+        <button class="preset-btn" id="presetMeeting" data-preset="meeting">Toplantı</button>
+        <button class="preset-btn" id="presetStudio" data-preset="studio">Yayın</button>
+      </div>
+    </div>
+
+    <!-- MAIN SEGMENTED TABS -->
+    <nav class="tab-rail" role="tablist" aria-label="Bölümler">
+      <button class="tab-pill active" data-tab="videoTab" role="tab" id="tab-video">Kamera</button>
+      <button class="tab-pill" data-tab="audioTab" role="tab" id="tab-audio">Ses</button>
+      <button class="tab-pill" data-tab="settingsTab" role="tab" id="tab-settings">Ayarlar</button>
+    </nav>
+
+    <!-- TAB 1: KAMERA -->
+    <div class="tab-panel active" id="videoTab" role="tabpanel">
+      <!-- ARKA PLAN MODU -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">İzolasyon Modu</span>
+        </div>
+        <div class="mode-selector" role="group">
+          <button class="mode-btn" data-mode="original">Orijinal</button>
+          <button class="mode-btn active" data-mode="blur">Bulanık</button>
+          <button class="mode-btn" data-mode="virtual">Sanal</button>
+          <button class="mode-btn" data-mode="color">Düz Renk</button>
+        </div>
+      </div>
+
+      <!-- BULANIKLIK SLIDER -->
+      <div class="panel-block" id="blurSettingsCard">
+        <div class="block-header">
+          <span class="block-label">Bulanıklık Seviyesi</span>
+          <span class="block-value" id="blurValueLabel">15px</span>
+        </div>
+        <div class="slider-track-wrap">
+          <input type="range" class="slider" id="blurSlider" min="5" max="35" step="5" value="15">
+        </div>
+      </div>
+
+      <!-- SANAL ARKA PLANLAR -->
+      <div class="panel-block" id="virtualSettingsCard" style="display: none;">
+        <div class="block-header">
+          <span class="block-label">Arka Plan Kataloğu</span>
+        </div>
+         <div class="bg-grid">
+          <!-- v2.6 Fotogerçekçi HD Stüdyolar -->
+          <button class="bg-tile active" data-bg="modern-office" title="Modern Ofis (HD)">
+            <div class="bg-thumb office-hd-bg"></div>
+            <span>Ofis (HD)</span>
+          </button>
+          <button class="bg-tile" data-bg="minimalist-loft" title="Minimalist Loft (HD)">
+            <div class="bg-thumb loft-hd-bg"></div>
+            <span>Loft (HD)</span>
+          </button>
+          <button class="bg-tile" data-bg="bookshelf-library" title="Ahşap Kütüphane (HD)">
+            <div class="bg-thumb library-hd-bg"></div>
+            <span>Kitaplık (HD)</span>
+          </button>
+          <button class="bg-tile" data-bg="modern-cafe" title="Modern Cafe (HD)">
+            <div class="bg-thumb cafe-hd-bg"></div>
+            <span>Kafe (HD)</span>
+          </button>
+          <button class="bg-tile" data-bg="scandinavian-room" title="İskandinav Salon (HD)">
+            <div class="bg-thumb scan-hd-bg"></div>
+            <span>Salon (HD)</span>
+          </button>
+
+          <!-- Klasik Vektörler -->
+          <button class="bg-tile" data-bg="classroom" title="Sınıf">
+            <div class="bg-thumb classroom-bg"></div>
+            <span>Sınıf</span>
+          </button>
+          <button class="bg-tile" data-bg="studio" title="Stüdyo">
+            <div class="bg-thumb studio-bg"></div>
+            <span>Stüdyo</span>
+          </button>
+          <button class="bg-tile" data-bg="nature" title="Doğa">
+            <div class="bg-thumb nature-bg"></div>
+            <span>Doğa</span>
+          </button>
+          <button class="bg-tile custom-bg-slot" id="customBgSlot" data-bg="custom">
+            <div class="bg-thumb add-bg">+</div>
+            <span>Özel</span>
+            <input type="file" id="customBgInput" accept="image/*" style="display: none;">
+          </button>
+        </div>
+
+        <div class="mood-tones-block">
+          <span class="sub-label">Renk Tonu:</span>
+          <div class="mood-chips">
+            <button class="mood-chip active" data-tone="none">Nötr</button>
+            <button class="mood-chip" data-tone="warm">Sıcak</button>
+            <button class="mood-chip" data-tone="cool">Soğuk</button>
+            <button class="mood-chip" data-tone="cyber">Koyu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRESENTER MODE (KAMERA İÇİ SUNUCU / EKRAN PAYLAŞIMI) -->
+      <div class="panel-block" id="presenterBlock">
+        <div class="filter-row">
+          <div class="filter-info">
+            <div class="filter-name">Sunucu Modu (Presenter Mode)</div>
+            <div class="filter-desc">Slaytı kamera içine veya arka plana yerleştirir</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="presenterModeToggle">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+        <div class="presenter-controls" id="presenterControls" style="margin-top: 8px; display: none;">
+          <div class="mood-tones-block">
+            <span class="sub-label">Sunum Düzeni:</span>
+            <div class="mood-chips">
+              <button class="mood-chip active" data-layout="pip-bottom-right">Köşe PiP</button>
+              <button class="mood-chip" data-layout="side-by-side">Yan Yana</button>
+              <button class="mood-chip" data-layout="background-slide">Arka Plan</button>
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 6px;">
+            <button class="action-btn" id="startScreenShareBtn" style="flex: 1;">🖥️ Ekran Paylaşımını Başlat</button>
+            <button class="action-btn" id="stopScreenShareBtn" style="background: var(--bg-elevated); color: var(--text-secondary); display: none;">Durdur</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DÜZ RENK / KROMA -->
+      <div class="panel-block" id="colorSettingsCard" style="display: none;">
+        <div class="block-header">
+          <span class="block-label">Kroma Rengi</span>
+          <span class="block-value">Düz Zemin</span>
+        </div>
+        <div class="color-picker-row">
+          <input type="color" id="solidColorInput" value="#107c41" class="color-picker">
+          <div class="color-presets">
+            <button class="color-preset" style="--c:#22c55e" data-color="#22c55e"></button>
+            <button class="color-preset" style="--c:#3b82f6" data-color="#3b82f6"></button>
+            <button class="color-preset" style="--c:#1e1e2e" data-color="#1e1e2e"></button>
+            <button class="color-preset" style="--c:#fafafa" data-color="#fafafa"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIRTUAL RING LIGHT & BEAUTY FILTER -->
+      <div class="panel-block">
+        <div class="filter-row">
+          <div class="filter-info">
+            <div class="filter-name">Stüdyo Işığı (Ring Light)</div>
+            <div class="filter-desc">Yüzünüzü dengeli aydınlatır</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="ringLightToggle">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+        <div class="ring-light-controls" style="margin-top: 4px;">
+          <input type="range" class="slider" id="ringLightSlider" min="10" max="80" step="5" value="30" style="flex: 1;">
+          <span class="block-value" id="ringLightValueLabel" style="width: 38px; text-align: right;">30%</span>
+        </div>
+        <div class="mood-tones-block" style="padding-top: 2px;">
+          <span class="sub-label">Işık Sıcaklığı:</span>
+          <div class="mood-chips">
+            <button class="mood-chip active" data-ringtone="neutral">Nötr</button>
+            <button class="mood-chip" data-ringtone="warm">Sıcak</button>
+            <button class="mood-chip" data-ringtone="cold">Soğuk</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <div class="filter-row">
+          <div class="filter-info">
+            <div class="filter-name">Cilt Yumuşatma (Beauty)</div>
+            <div class="filter-desc">Pürüzsüz ve doğal cilt dokusu</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="beautyFilterToggle">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+        <div class="ring-light-controls" style="margin-top: 4px;">
+          <input type="range" class="slider" id="beautySlider" min="10" max="80" step="5" value="40" style="flex: 1;">
+          <span class="block-value" id="beautyValueLabel" style="width: 38px; text-align: right;">40%</span>
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <div class="filter-row">
+          <div class="filter-info">
+            <div class="filter-name">Otomatik Kadraj (Center Stage)</div>
+            <div class="filter-desc">Kullanıcıyı ortalayarak dinamik kadrajlar</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="autoFramingToggle">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- SUNUM ZAMANLAYICISI & GÖZ KILAVUZU -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Sunum Zamanlayıcısı</span>
+          <span class="block-value" id="countdownTimerLabel">Kapalı</span>
+        </div>
+        <div class="countdown-controls">
+          <button class="mood-chip" data-min="5">5 dk</button>
+          <button class="mood-chip" data-min="10">10 dk</button>
+          <button class="mood-chip" data-min="15">15 dk</button>
+          <button class="action-btn" id="startCountdownBtn" style="margin-left: auto;">Başlat</button>
+          <button class="action-btn" id="stopCountdownBtn" style="background: var(--bg-elevated); color: var(--text-secondary);">Durdur</button>
+        </div>
+      </div>
+
+      <!-- EMOJİ TEPKİLERİ (CANLI REAKSİYONLAR) -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Canlı Reaksiyonlar</span>
+        </div>
+        <div class="reactions-grid">
+          <button class="rx-btn" data-emoji="👏">👏 Alkış</button>
+          <button class="rx-btn" data-emoji="❤️">❤️ Kalp</button>
+          <button class="rx-btn" data-emoji="🔥">🔥 Harika</button>
+          <button class="rx-btn" data-emoji="🎉">🎉 Kutlama</button>
+          <button class="rx-btn" data-emoji="💡">💡 Fikir</button>
+          <button class="rx-btn" data-emoji="👍">👍 Beğeni</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SES -->
+    <div class="tab-panel" id="audioTab" role="tabpanel">
+      <!-- HERO: STUDIO MODU -->
+      <div class="teacher-hero">
+        <div class="teacher-hero-text">
+          <h3>Studio Ses Motoru</h3>
+          <p>Yapay zeka gürültü filtreleme & ses netliği</p>
+        </div>
+        <label class="power-toggle" title="Studio modunu aç/kapat">
+          <input type="checkbox" id="teacherModeToggle" checked>
+          <span class="power-track"><span class="power-knob"></span></span>
+        </label>
+      </div>
+
+      <!-- SES PROFİLLERİ -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Vokal Profili</span>
+        </div>
+        <div class="voice-char-grid">
+          <button class="char-chip active" data-char="natural">Doğal</button>
+          <button class="char-chip" data-char="radio">Radyo</button>
+          <button class="char-chip" data-char="crisp">Net Vokal</button>
+          <button class="char-chip" data-char="privacy">Gizlilik</button>
+        </div>
+      </div>
+
+      <!-- SES FİLTRELERİ LİSTESİ -->
+      <div class="panel-block">
+        <div class="filter-list" role="group">
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">Gürültü Baskılama</div>
+              <div class="filter-desc">Fan, klima ve arka plan gürültülerini keser</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="noiseSuppressionToggle" checked>
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">İkincil Ses Kalkanı</div>
+              <div class="filter-desc">Ortamdaki diğer insan seslerini zayıflatır</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="voiceShieldToggle">
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">Akustik Yankı Engelleme</div>
+              <div class="filter-desc">Hoparlörden mikrofona dönen yankıyı önler</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="echoCancellationToggle" checked>
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">De-Esser (Tıslama Önleyici)</div>
+              <div class="filter-desc">Sert 'S' ve 'Ş' seslerini yumuşatır</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="deEsserToggle" checked>
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+
+          <div class="filter-divider"></div>
+
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">Vokal Netleştirme (EQ)</div>
+              <div class="filter-desc">Konuşma frekanslarını otomatik dengeler</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="voiceBoostToggle" checked>
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOISE GATE -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Gürültü Kapısı (Noise Gate)</span>
+          <span class="block-value" id="gateValueLabel">−48 dB</span>
+        </div>
+        <div class="slider-track-wrap">
+          <input type="range" class="slider" id="gateSlider" min="-60" max="-30" step="2" value="-48">
+        </div>
+      </div>
+
+      <!-- TONE SHAPING SLIDERS -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Ton Ekolayzır</span>
+        </div>
+        <div class="tone-sliders-grid">
+          <div class="tone-slider-item">
+            <div class="tone-header">
+              <span>Bas</span>
+              <span id="bassValueLabel">0 dB</span>
+            </div>
+            <input type="range" class="slider" id="bassSlider" min="-6" max="6" step="1" value="0">
+          </div>
+          <div class="tone-slider-item">
+            <div class="tone-header">
+              <span>Tiz</span>
+              <span id="trebleValueLabel">0 dB</span>
+            </div>
+            <input type="range" class="slider" id="trebleSlider" min="-6" max="6" step="1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- SOUNDBOARD -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Ses Efektleri (Soundboard)</span>
+        </div>
+        <div class="soundboard-grid">
+          <button class="sound-btn" data-sound="applause">👏 Alkış</button>
+          <button class="sound-btn" data-sound="ding">🔔 Zil</button>
+          <button class="sound-btn" data-sound="success">✨ Onay</button>
+          <button class="sound-btn" data-sound="drum">🥁 Bateri</button>
+          <button class="sound-btn custom-sound-btn" id="customSoundBtn1" data-slot="slot1">📁 Özel 1</button>
+          <button class="sound-btn custom-sound-btn" id="customSoundBtn2" data-slot="slot2">📁 Özel 2</button>
+          <input type="file" id="customSoundInput1" accept="audio/*" style="display: none;">
+          <input type="file" id="customSoundInput2" accept="audio/*" style="display: none;">
+        </div>
+      </div>
+
+      <!-- FREKANS SPEKTRUMU -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Frekans Spektrumu</span>
+          <span class="block-value" id="spectrumStatus">Aktif</span>
+        </div>
+        <div class="spectrum-visualizer" id="spectrumVisualizer">
+          <div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div>
+          <div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div>
+          <div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div>
+          <div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div><div class="s-bar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: AYARLAR -->
+    <div class="tab-panel" id="settingsTab" role="tabpanel">
+      <!-- TELEPROMPTER -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Teleprompter</span>
+          <label class="toggle">
+            <input type="checkbox" id="teleprompterToggle">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+        <textarea id="teleprompterTextInput" class="text-input" rows="2" placeholder="Konuşma notlarınızı girin..."></textarea>
+      </div>
+
+      <!-- LOWER THIRDS (İSİMLİK) -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Alt Bant (İsimlik)</span>
+          <label class="toggle">
+            <input type="checkbox" id="lowerThirdsToggle">
+            <span class="toggle-track"><span class="toggle-knob"></span></span>
+          </label>
+        </div>
+        <div class="name-badge-inputs">
+          <input type="text" id="badgeNameInput" class="text-input" placeholder="Ad Soyad">
+          <input type="text" id="badgeTitleInput" class="text-input" placeholder="Unvan / Konu">
+        </div>
+      </div>
+
+      <!-- KONTROLLER LİSTESİ -->
+      <div class="panel-block">
+        <div class="filter-list" role="group">
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">Bas-Konuş (Space)</div>
+              <div class="filter-desc">Space tuşuyla mikrofonu açın</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="pushToTalkToggle">
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+
+          <!-- Kenar Yumuşatma -->
+          <div class="filter-row">
+            <div class="filter-info">
+              <div class="filter-name">Kenar Yumuşatma</div>
+              <div class="filter-desc">Kullanıcı hatlarında pürüzsüz geçiş</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="smoothEdgesToggle" checked>
+              <span class="toggle-track"><span class="toggle-knob"></span></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ÖZEL PROFİL KAYDET -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Özel Profil Kaydet</span>
+        </div>
+        <div class="save-profile-row">
+          <input type="text" id="newProfileNameInput" class="text-input" placeholder="Profil adı">
+          <button class="action-btn" id="saveCustomProfileBtn">Kaydet</button>
+        </div>
+        <div class="custom-profiles-list" id="customProfilesList"></div>
+      </div>
+
+      <!-- KISAYOLLAR -->
+      <div class="panel-block">
+        <div class="block-header">
+          <span class="block-label">Klavye Kısayolları</span>
+        </div>
+        <div class="shortcuts-list">
+          <div class="shortcut-row">
+            <span>Studio Modu</span>
+            <kbd>Alt + M</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span>Bulanıklık</span>
+            <kbd>Alt + B</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span>Konsol</span>
+            <kbd>Alt + W</kbd>
+          </div>
+          <div class="shortcut-row">
+            <span>Bas-Konuş</span>
+            <kbd>Space</kbd>
+          </div>
+        </div>
+      </div>
+
+      <!-- GİZLİLİK KARTI -->
+      <div class="privacy-card">
+        <h4>Yerel & Güvenli İşleme</h4>
+        <p>Tüm video ve ses sinyalleri tarayıcınızda yerel işlenir. Harici hiçbir sunucuya görüntü veya ses iletilmez.</p>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <span class="footer-brand">isolaTOR Studio</span>
+      <span>v2.6.0</span>
+    </footer>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

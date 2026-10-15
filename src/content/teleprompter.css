@@ -1,0 +1,92 @@
+/* Ghost Teleprompter Styling (v2.3) */
+.teleprompter-box {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 480px;
+  height: 170px;
+  background: rgba(10, 14, 28, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(129, 140, 248, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(129, 140, 248, 0.2);
+  z-index: 9999999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  color: #f1f5f9;
+}
+
+.tp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  user-select: none;
+}
+
+.tp-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #c4b5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+.tp-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tp-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tp-btn:hover {
+  background: rgba(129, 140, 248, 0.3);
+  border-color: #818cf8;
+}
+
+.tp-content {
+  flex: 1;
+  padding: 10px 14px;
+  overflow-y: auto;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #e2e8f0;
+  scroll-behavior: smooth;
+}
+
+.tp-content::-webkit-scrollbar {
+  width: 4px;
+}
+.tp-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}

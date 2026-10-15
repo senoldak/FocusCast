@@ -1,0 +1,271 @@
+﻿/* ═══════════════════════════════════════════════════════════════════════════
+   isolaTOR Floating Console (v2.0) — Premium In-Page Widget
+   Features: Studio Mode, Session Timer, Alert Bubbles & Deep Glassmorphism
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:host {
+  all: initial;
+  font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  color: #f0f4ff;
+  z-index: 2147483647;
+  position: fixed;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── ALERT BUBBLE ──────────────────────────────────────────────────────── */
+.alert-bubble {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(129, 140, 248, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 12px rgba(129, 140, 248, 0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f8fafc;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  white-space: nowrap;
+  z-index: 100;
+}
+
+.alert-bubble.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ─── WIDGET SHELL ─────────────────────────────────────────────────────── */
+.isolator-widget {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+
+  background: rgba(10, 14, 30, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: 18px;
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 28px rgba(129, 140, 248, 0.12);
+
+  cursor: grab;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.isolator-widget:hover {
+  border-color: rgba(129, 140, 248, 0.45);
+  box-shadow:
+    0 20px 56px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 0 36px rgba(129, 140, 248, 0.2);
+}
+
+.isolator-widget:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+/* ─── BRAND PILL ────────────────────────────────────────────────────────── */
+.brand-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(79, 70, 229, 0.25));
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  padding: 4px 8px;
+  border-radius: 9px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: #c4b5fd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.brand-pill:hover {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.45), rgba(79, 70, 229, 0.38));
+  border-color: rgba(167, 139, 250, 0.55);
+}
+
+.brand-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.4);
+  animation: dotPulse 2.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px #10b981; }
+  50%       { opacity: 0.7; transform: scale(0.85); box-shadow: 0 0 4px #10b981; }
+}
+
+/* Session Timer Badge */
+.session-timer-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #a8b3cf;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 6px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+}
+
+/* Separator */
+.w-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+/* ─── CONTROL BUTTONS ───────────────────────────────────────────────────── */
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #a8b3cf;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+
+.action-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #f0f4ff;
+  transform: translateY(-1px);
+}
+
+.action-btn.active {
+  background: linear-gradient(135deg, rgba(129, 140, 248, 0.25), rgba(34, 211, 238, 0.15));
+  border-color: rgba(129, 140, 248, 0.5);
+  color: #e0e7ff;
+  box-shadow: 0 0 14px rgba(129, 140, 248, 0.25);
+}
+
+/* ─── VU METER ──────────────────────────────────────────────────────────── */
+.vu-meter-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(6, 8, 16, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 6px;
+  border-radius: 7px;
+}
+
+.vu-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.vu-bar {
+  width: 3px;
+  height: 3px;
+  border-radius: 1.5px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: height 0.07s ease, background 0.07s ease;
+}
+
+.vu-bar.active-green  { background: #10b981; box-shadow: 0 0 4px #10b981; }
+.vu-bar.active-yellow { background: #f59e0b; box-shadow: 0 0 4px #f59e0b; }
+.vu-bar.active-red    { background: #f43f5e; box-shadow: 0 0 4px #f43f5e; }
+
+/* ─── ICON BUTTON ───────────────────────────────────────────────────────── */
+.icon-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #6272a4;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #f0f4ff;
+}
+
+.icon-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+/* ─── MINIMIZED STATE ───────────────────────────────────────────────────── */
+.isolator-widget.minimized {
+  padding: 6px;
+  border-radius: 50%;
+  gap: 0;
+}
+
+.isolator-widget.minimized .control-group,
+.isolator-widget.minimized .vu-meter-container,
+.isolator-widget.minimized .icon-btn,
+.isolator-widget.minimized .w-sep,
+.isolator-widget.minimized .session-timer-badge,
+.isolator-widget.minimized .brand-pill span,
+.isolator-widget.minimized .alert-bubble {
+  display: none;
+}
+
+.isolator-widget.minimized .brand-pill {
+  padding: 6px;
+  border-radius: 50%;
+  margin: 0;
+  gap: 0;
+}

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="100%" height="100%">
+  <defs>
+    <linearGradient id="wall" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a3b4c"/>
+      <stop offset="100%" stop-color="#1b2631"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7a583a"/>
+      <stop offset="100%" stop-color="#4a3523"/>
+    </linearGradient>
+    <linearGradient id="board" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#144d32"/>
+      <stop offset="100%" stop-color="#0c2e1e"/>
+    </linearGradient>
+  </defs>
+  <!-- Duvar ve Zemin -->
+  <rect width="1280" height="520" fill="url(#wall)"/>
+  <rect y="520" width="1280" height="200" fill="url(#floor)"/>
+
+  <!-- Pencereler -->
+  <rect x="80" y="80" width="220" height="340" rx="8" fill="#5dade2" opacity="0.25"/>
+  <line x1="190" y1="80" x2="190" y2="420" stroke="#1b2631" stroke-width="8"/>
+  <line x1="80" y1="250" x2="300" y2="250" stroke="#1b2631" stroke-width="8"/>
+
+  <!-- Yazı Tahtası / Akıllı Tahta -->
+  <rect x="360" y="70" width="560" height="360" rx="12" fill="#8d6e63" stroke="#5d4037" stroke-width="14"/>
+  <rect x="375" y="85" width="530" height="330" rx="6" fill="url(#board)"/>
+
+  <!-- Tahta Üzeri Çizgiler / Formüller -->
+  <text x="410" y="140" font-family="'Segoe UI', sans-serif" font-size="28" fill="#e8f8f5" opacity="0.85" font-weight="bold">isolaTOR Online Eğitim Sınıfı</text>
+  <text x="410" y="185" font-family="'Segoe UI', sans-serif" font-size="18" fill="#a3e4d7" opacity="0.75">E = mc²   |   f(x) = ax² + bx + c   |   H₂O + CO₂</text>
+  
+  <line x1="410" y1="220" x2="880" y2="220" stroke="#a3e4d7" stroke-width="2" stroke-dasharray="8,6" opacity="0.5"/>
+  <circle cx="460" cy="280" r="35" fill="none" stroke="#f9e79f" stroke-width="3" opacity="0.6"/>
+  <rect x="530" y="250" width="70" height="60" fill="none" stroke="#f1948a" stroke-width="3" opacity="0.6"/>
+  <polygon points="650,310 690,250 730,310" fill="none" stroke="#bb8fce" stroke-width="3" opacity="0.6"/>
+
+  <!-- Kitaplık Rafı -->
+  <rect x="980" y="120" width="240" height="20" rx="4" fill="#a0522d"/>
+  <rect x="990" y="60" width="22" height="60" fill="#e74c3c" rx="2"/>
+  <rect x="1015" y="50" width="26" height="70" fill="#3498db" rx="2"/>
+  <rect x="1044" y="65" width="20" height="55" fill="#f1c40f" rx="2"/>
+  <rect x="1067" y="55" width="28" height="65" fill="#2ecc71" rx="2"/>
+  <rect x="1098" y="70" width="22" height="50" fill="#9b59b6" rx="2"/>
+  <rect x="1123" y="60" width="24" height="60" fill="#e67e22" rx="2"/>
+
+  <!-- Saksı Bitki -->
+  <path d="M 1165 120 L 1185 120 L 1180 85 L 1170 85 Z" fill="#d35400"/>
+  <circle cx="1175" cy="70" r="16" fill="#27ae60"/>
+  <circle cx="1165" cy="60" r="12" fill="#2ecc71"/>
+  <circle cx="1185" cy="62" r="13" fill="#2ecc71"/>
+
+  <!-- Öğretmen Masası Kenarı -->
+  <rect x="150" y="560" width="980" height="160" rx="14" fill="#5c3a21" opacity="0.9"/>
+  <rect x="170" y="540" width="940" height="30" rx="8" fill="#784c28"/>
+  <rect x="520" y="555" width="240" height="15" rx="4" fill="#3e2715"/>
+</svg>
